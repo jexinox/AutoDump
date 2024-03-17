@@ -1,10 +1,8 @@
-﻿using Guts.Models;
-using Guts.Server.CQRS;
+﻿using Guts.Server.CQRS;
 using Guts.Server.Dumps.Repositories;
 using Guts.Server.Dumps.Upload;
 using Guts.Server.Modules;
 using Kontur.Results;
-using Mapster;
 
 namespace Guts.Server.Dumps.Module;
 
@@ -30,7 +28,7 @@ public class DumpsModule : IApiModule
                     ICommandHandler<UploadDumpCommand, Result<UploadDumpError>> handler) =>
                 {
                     var command = new UploadDumpCommand(new(hostName), new(dumpArchive));
-                    await handler.Handle(command);
+                    return await handler.Handle(command).MapFault(_ => Results.Ok());
                 })
             .Accepts<Stream>("application/octet-stream");
 
