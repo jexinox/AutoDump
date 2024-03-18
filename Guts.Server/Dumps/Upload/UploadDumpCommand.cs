@@ -2,4 +2,4 @@
 
 namespace Guts.Server.Dumps.Upload;
 
-public record UploadDumpCommand(HostName HostName, DumpArchive DumpArchive);
+public record UploadDumpCommand(DumpMetadata Metadata, DumpArchive DumpArchive);

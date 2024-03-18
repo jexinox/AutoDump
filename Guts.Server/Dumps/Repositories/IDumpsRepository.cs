@@ -5,5 +5,5 @@ namespace Guts.Server.Dumps.Repositories;
 
 public interface IDumpsRepository
 {
-    Task<Result<DbUploadDumpError>> LoadDump(HostName hostName, DumpArchive dumpArchive);
+    Task<Result<DbUploadDumpError>> LoadDump(DumpMetadata hostName, DumpArchive dumpArchive);
 }

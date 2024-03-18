@@ -9,7 +9,7 @@ public class UploadDumpHandler(IDumpsRepository dumpsRepository) : ICommandHandl
     public async Task<Result<UploadDumpError>> Handle(UploadDumpCommand command)
     {
         var (hostName, dumpArchive) = command;
-        
+
         return await dumpsRepository
             .LoadDump(hostName, dumpArchive)
             .MapFault(dbError => new UploadDumpError());
