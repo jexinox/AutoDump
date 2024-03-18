@@ -14,8 +14,4 @@
       <PackageReference Include="MongoDB.Driver.GridFS" Version="2.24.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Guts.Models\Guts.Models.csproj" />
-    </ItemGroup>
-
 </Project>
