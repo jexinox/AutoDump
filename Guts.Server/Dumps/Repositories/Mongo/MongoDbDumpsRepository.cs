@@ -1,17 +1,26 @@
-﻿using Guts.Models;
+﻿using Guts.Server.Dumps.FeatureModels;
 using Kontur.Results;
+using MongoDB.Driver;
 
 namespace Guts.Server.Dumps.Repositories.Mongo;
 
-/*
- * (
-    IMongoCollection<MongoDumpMetadata> collection,
-    IGridFSBucket<Guid> gridFsBucket)
- */
-public class MongoDbDumpsRepository : IDumpsRepository
+public class MongoDbDumpsRepository(
+    IMongoCollection<MongoDumpMetadata> collection) : IDumpsRepository
 {
-    public Task<Result<DbUploadDumpError>> LoadDump(DumpMetadata hostName, DumpArchive dumpArchive)
+    public async Task<Result<RepositoryUploadDumpMetadataError, DumpId>> LoadDumpMetadata(DumpMetadata meta)
     {
-        throw new NotImplementedException();
+        var dumpId = Guid.NewGuid();
+
+        var mongoMeta = new MongoDumpMetadata
+        {
+            BlobStorageFileId = dumpId,
+            HostName = meta.HostName,
+            FileName = meta.FileName,
+            TimeStamp = meta.TimeStamp
+        };
+
+        await collection.InsertOneAsync(mongoMeta);
+        
+        return new DumpId(dumpId);
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Guts.Server.CQRS;
+using Guts.Server.Dumps.FeatureModels;
 using Guts.Server.Dumps.Repositories;
 using Guts.Server.Dumps.Repositories.Mongo;
 using Guts.Server.Dumps.Upload;
 using Guts.Server.Modules;
 using Kontur.Results;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
+using MongoDB.Driver;
 
 namespace Guts.Server.Dumps;
 
@@ -12,32 +14,56 @@ public class DumpsModule : IApiModule
 {
     public IServiceCollection AddServices(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IDumpsRepository, MongoDbDumpsRepository>();
+        //TODO: configs
+        serviceCollection.AddSingleton<IMongoClient>(_ => new MongoClient(
+            new MongoUrl("mongodb://localhost:27017/?readPreference=primary&appname=guts.server&directConnection=true&ssl=false")));
+
+        serviceCollection.AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase("Guts"));
+
+        serviceCollection.AddScoped<IMongoCollection<MongoDumpMetadata>>(
+            sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<MongoDumpMetadata>("DumpsMeta"));
         
-        serviceCollection.AddSingleton<ICommandHandler<UploadDumpCommand, Result<UploadDumpError>>, UploadDumpHandler>();
+        serviceCollection.AddScoped<IDumpsRepository, MongoDbDumpsRepository>();
+        
+        serviceCollection.AddScoped<
+            ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>>, UploadDumpMetadataHandler>();
 
         return serviceCollection;
     }
-
+    
     public IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints)
     {
-        // TODO (jexinox): faults mapping
         endpoints
-            .MapPost(
-                "/api/v1/dumps",
-                async (
-                    [FromForm] UploadDumpRequest request,
-                    ICommandHandler<UploadDumpCommand, Result<UploadDumpError>> handler) =>
-                {
-                    var command = new UploadDumpCommand(
-                        new(new(request.HostName), new(request.FileName), new(request.TimeStamp)),
-                        new(request.DumpArchive.OpenReadStream()));
-                    return await handler.Handle(command).MapFault(_ => Results.Ok());
-                })
-            .Accepts<UploadDumpRequest>("multipart/form-data")
-            .Produces(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status500InternalServerError);
+            .MapPost(ApiConstants.V1 + "/hosts/{hostName}/dumps", UploadDumpMetadata)
+            .WithName(nameof(UploadDumpMetadata));
+
+        endpoints
+            .MapPut(ApiConstants.V1 + "/hosts/{hostName}/dumps/{dumpId:guid}", () => Results.Ok())
+            .WithName("UploadDump");
 
         return endpoints;
     }
+    
+    private record UploadDumpMetadataRequest(string FileName, DateTimeOffset TimeStamp);
+
+    private static async Task<Results<CreatedAtRoute, BadRequest>> UploadDumpMetadata(
+        string hostName,
+        UploadDumpMetadataRequest request,
+        ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>> handler)
+    {
+        // TODO: faults
+        var handleResult = await handler
+            .Handle(new(new(hostName, request.FileName, request.TimeStamp)))
+            .MapValue(id => TypedResults.CreatedAtRoute("UploadDump", new RouteValueDictionary
+            {
+                ["hostName"] = hostName,
+                ["dumpId"] = id.Value 
+            }))
+            .MapFault(_ => TypedResults.BadRequest());
+                    
+        return handleResult.TryGetValue(out var value, out var fault) 
+            ? value 
+            : fault;
+    }
 }
+

@@ -1,6 +1,6 @@
 ﻿namespace Guts.Server.Dumps.Repositories;
 
-public struct DbUploadDumpError
+public struct RepositoryUploadDumpMetadataError
 {
     
 }

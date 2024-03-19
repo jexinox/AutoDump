@@ -1,6 +1,5 @@
 using Guts.Server.Dumps;
 using Guts.Server.Modules;
-using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 var modules = new IApiModule[] { new DumpsModule() };
@@ -12,8 +11,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services
-    .AddModulesServices(modules)
-    .AddMapster();
+    .AddModulesServices(modules);
 
 var app = builder.Build();
 

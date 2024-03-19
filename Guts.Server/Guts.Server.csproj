@@ -8,8 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="Kontur.Results" Version="3.0.0" />
-      <PackageReference Include="Mapster" Version="7.4.0" />
-      <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
+      <PackageReference Include="Kontur.Results.Monad" Version="3.0.0" />
       <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
       <PackageReference Include="MongoDB.Driver.GridFS" Version="2.24.0" />
     </ItemGroup>
