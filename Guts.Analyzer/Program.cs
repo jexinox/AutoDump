@@ -1,4 +1,6 @@
-﻿using Microsoft.Diagnostics.Runtime;
+﻿using Guts.Analyzer;
+using Guts.Analyzer.Metrics;
+using Microsoft.Diagnostics.Runtime;
 
 var dump = DataTarget.LoadDump("./test-dump.dmp");
 
@@ -9,20 +11,12 @@ var clr = dump.ClrVersions[0].CreateRuntime();
 //     Console.WriteLine(heap.Kind);
 //     Console.WriteLine(heap.GCHeap);
 // }
-var objectsGenerations = clr.Heap
-    .EnumerateObjects()
-    .Select(obj => obj.Address)
-    .Select(address =>
-    {
-        var segment = clr.Heap.GetSegmentByAddress(address);
-        return segment?.GetGeneration(address);
-    })
-    .SelectMany(gen => gen is null ? [] : new[] { gen.Value })
-    .CountBy(gen => gen)
-    .ToDictionary();
+var clrProvider = new StubClrRuntimeProvider(clr);
+var objectsGenerationsMetricProvider = new ObjectsByGenerationsDistributionMetricProvider(clrProvider);
 
-foreach (var kvp in objectsGenerations)
+Console.WriteLine(clr.Heap.Segments.Any(segment => segment.Kind is GCSegmentKind.Generation0 or GCSegmentKind.Generation1));
+
+foreach (var kvp in objectsGenerationsMetricProvider.Get())
 {
-    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+    Console.WriteLine($"{kvp.Key}: {kvp.Count()}");
 }
-
