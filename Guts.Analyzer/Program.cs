@@ -2,7 +2,7 @@
 using Guts.Analyzer.Metrics;
 using Microsoft.Diagnostics.Runtime;
 
-var dump = DataTarget.LoadDump("./test-dump-net6.dmp");
+var dump = DataTarget.LoadDump("./Dumps/test-dump-net9ws.dmp");
 
 var clr = dump.ClrVersions[0].CreateRuntime();
 
@@ -14,7 +14,8 @@ var clr = dump.ClrVersions[0].CreateRuntime();
 var clrProvider = new StubClrRuntimeProvider(clr);
 var objectsGenerationsMetricProvider = new ObjectsByGenerationsDistributionMetricProvider(clrProvider);
 
-Console.WriteLine(clr.Heap.Segments.Any(segment => segment.Kind is GCSegmentKind.Generation0 or GCSegmentKind.Generation1));
+Console.WriteLine($"Is server: {clr.Heap.IsServer}");
+Console.WriteLine($"Uses regions: {clr.Heap.Segments.Any(segment => segment.Kind is GCSegmentKind.Generation0 or GCSegmentKind.Generation1)}");
 
 foreach (var kvp in objectsGenerationsMetricProvider.Get())
 {

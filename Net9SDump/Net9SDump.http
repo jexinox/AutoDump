@@ -1,0 +1,6 @@
+@Net9SDump_HostAddress = http://localhost:5130
+
+GET {{Net9SDump_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

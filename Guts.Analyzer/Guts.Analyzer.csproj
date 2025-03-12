@@ -12,9 +12,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="test-dump-net6.dmp">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="Dumps\test-dump-net6s.dmp">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Dumps\test-dump-net9s.dmp">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Dumps\test-dump-net9ws.dmp">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
