@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="test-dump.dmp">
+      <None Update="test-dump-net6.dmp">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

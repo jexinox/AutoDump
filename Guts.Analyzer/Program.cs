@@ -2,7 +2,7 @@
 using Guts.Analyzer.Metrics;
 using Microsoft.Diagnostics.Runtime;
 
-var dump = DataTarget.LoadDump("./test-dump.dmp");
+var dump = DataTarget.LoadDump("./test-dump-net6.dmp");
 
 var clr = dump.ClrVersions[0].CreateRuntime();
 
