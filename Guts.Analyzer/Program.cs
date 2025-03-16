@@ -1,8 +1,8 @@
 ﻿using Guts.Analyzer;
-using Guts.Analyzer.Metrics;
+using Guts.Analyzer.DataProviders;
 using Microsoft.Diagnostics.Runtime;
 
-var dump = DataTarget.LoadDump("./Dumps/test-dump-net9ws.dmp");
+var dump = DataTarget.LoadDump("./Dumps/test-dump-net6s.dmp");
 
 var clr = dump.ClrVersions[0].CreateRuntime();
 
@@ -12,12 +12,14 @@ var clr = dump.ClrVersions[0].CreateRuntime();
 //     Console.WriteLine(heap.GCHeap);
 // }
 var clrProvider = new StubClrRuntimeProvider(clr);
-var objectsGenerationsMetricProvider = new ObjectsByGenerationsDistributionMetricProvider(clrProvider);
+// var objectsDistributionDataProvider = new ObjectsDistributionByGenerationsDataProvider(clrProvider);
+var objectsTreeProvider = new ObjectsTreeProvider(clrProvider);
+var fragmentationDataProvider = new GenerationsFragmentationDataProvider(clrProvider, objectsTreeProvider);
 
 Console.WriteLine($"Is server: {clr.Heap.IsServer}");
 Console.WriteLine($"Uses regions: {clr.Heap.Segments.Any(segment => segment.Kind is GCSegmentKind.Generation0 or GCSegmentKind.Generation1)}");
 
-foreach (var kvp in objectsGenerationsMetricProvider.Get())
+foreach (var (generation, fragmentation) in fragmentationDataProvider.Get())
 {
-    Console.WriteLine($"{kvp.Key}: {kvp.Count()}");
+    Console.WriteLine($"{generation}, Total: {fragmentation.Total / 1024d / 1024d}, Used (KB): {fragmentation.Used / 1024d}, Used (MB): {fragmentation.Used / 1024d / 1024d}");
 }
