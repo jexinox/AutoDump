@@ -29,7 +29,7 @@ public class GenerationsFragmentationDataProvider
                 var genSizeInSegment = GetGenerationSize(segment, generation);
 
                 segmentGenSizes[generation] = segmentGenSizes.TryGetValue(generation, out var sizes)
-                    ? (sizes.Total + genSizeInSegment, sizes.Used + obj.Size)
+                    ? (sizes.Total, sizes.Used + obj.Size)
                     : (genSizeInSegment, obj.Size);
             }
 
@@ -44,9 +44,10 @@ public class GenerationsFragmentationDataProvider
         return result;
     }
 
+    // refactor to more readable logic
     private static ulong GetGenerationSize(ClrSegment segment, Generation generation)
     {
-        if (segment.Kind <= GCSegmentKind.Frozen)
+        if (segment.Kind <= GCSegmentKind.Frozen) // hack from segment.GetGeneration
         {
             return segment.CommittedMemory.Length;
         }
