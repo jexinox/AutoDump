@@ -21,5 +21,5 @@ Console.WriteLine($"Uses regions: {clr.Heap.Segments.Any(segment => segment.Kind
 
 foreach (var (generation, fragmentation) in fragmentationDataProvider.Get())
 {
-    Console.WriteLine($"{generation}, Total: {fragmentation.Total / 1024d / 1024d}, Used (KB): {fragmentation.Used / 1024d}, Used (MB): {fragmentation.Used / 1024d / 1024d}");
+    Console.WriteLine($"{generation}, Total (B): {fragmentation.Total}, Total (MB): {fragmentation.Total / 1024d / 1024d}, Used (B): {fragmentation.Used} Used (KB): {fragmentation.Used / 1024d}, Used (MB): {fragmentation.Used / 1024d / 1024d}");
 }
