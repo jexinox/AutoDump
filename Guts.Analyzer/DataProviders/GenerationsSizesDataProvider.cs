@@ -2,12 +2,12 @@
 
 namespace Guts.Analyzer.DataProviders;
 
-public class GenerationsFragmentationDataProvider
+public class GenerationsSizesDataProvider
 {
     private readonly IClrRuntimeProvider _runtimeProvider;
     private readonly ObjectsTreeProvider _objectsTreeProvider;
 
-    public GenerationsFragmentationDataProvider(
+    public GenerationsSizesDataProvider(
         IClrRuntimeProvider runtimeProvider,
         ObjectsTreeProvider objectsTreeProvider)
     {

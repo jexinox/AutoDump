@@ -14,7 +14,7 @@ var clr = dump.ClrVersions[0].CreateRuntime();
 var clrProvider = new StubClrRuntimeProvider(clr);
 // var objectsDistributionDataProvider = new ObjectsDistributionByGenerationsDataProvider(clrProvider);
 var objectsTreeProvider = new ObjectsTreeProvider(clrProvider);
-var fragmentationDataProvider = new GenerationsFragmentationDataProvider(clrProvider, objectsTreeProvider);
+var fragmentationDataProvider = new GenerationsSizesDataProvider(clrProvider, objectsTreeProvider);
 
 Console.WriteLine($"Is server: {clr.Heap.IsServer}");
 Console.WriteLine($"Uses regions: {clr.Heap.Segments.Any(segment => segment.Kind is GCSegmentKind.Generation0 or GCSegmentKind.Generation1)}");
