@@ -3,19 +3,19 @@ using Microsoft.Diagnostics.Runtime;
 
 namespace Guts.Analyzer.Statistics;
 
-public class TypesTopStatProvider
+public class TypesBySizeTopStatProvider
 {
-    private readonly ObjectsTreeProvider _objectsTreeProvider;
+    private readonly ObjectsTreeFactory _objectsTreeFactory;
 
-    public TypesTopStatProvider(ObjectsTreeProvider objectsTreeProvider)
+    public TypesBySizeTopStatProvider(ObjectsTreeFactory objectsTreeFactory)
     {
-        _objectsTreeProvider = objectsTreeProvider;
+        _objectsTreeFactory = objectsTreeFactory;
     }
 
-    public IReadOnlyList<(string Type, ulong OccupiedSize)> Get()
+    public IEnumerable<(string Type, ulong OccupiedSize)> Get()
     {
         var result = new Dictionary<string, ulong>();
-        var objectsAndTypes = _objectsTreeProvider.Get().ObjectNodes.Values
+        var objectsAndTypes = _objectsTreeFactory.GetTree().ObjectNodes.Values
             .Select(node => (node.Object, node.Object.Type?.Name))
             .Where(pair => pair.Name is not null)
             .OfType<(ClrObject, string)>();
@@ -28,7 +28,6 @@ public class TypesTopStatProvider
         
         return result
             .Select(kvp => (kvp.Key, kvp.Value))
-            .OrderByDescending(pair => pair.Value)
-            .ToList();
+            .OrderByDescending(pair => pair.Value);
     }
 }

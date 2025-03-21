@@ -2,18 +2,19 @@
 
 namespace Guts.Analyzer.DataProviders;
 
-public class ObjectsTreeProvider
+public class ObjectsTreeFactory
 {
-    private readonly IClrRuntimeProvider _runtimeProvider;
+    private readonly Lazy<ObjectsTree> _tree;
 
-    public ObjectsTreeProvider(IClrRuntimeProvider runtimeProvider)
+    public ObjectsTreeFactory(IClrRuntimeProvider runtimeProvider)
     {
-        _runtimeProvider = runtimeProvider;
+        _tree = new(() => BuildTree(runtimeProvider.GetCurrentDumpRuntime().Heap));
     }
+    
+    public ObjectsTree GetTree() => _tree.Value;
 
-    public ObjectsTree Get()
+    private static ObjectsTree BuildTree(ClrHeap heap)
     {
-        var heap = _runtimeProvider.GetCurrentDumpRuntime().Heap;
         var visited = new HashSet<ulong>();
         var memo = new Dictionary<ulong, ObjectNode>();
         var roots = heap
@@ -27,7 +28,7 @@ public class ObjectsTreeProvider
 
     private static ObjectNode? GetObjectNode(ClrObject obj, HashSet<ulong> visited, Dictionary<ulong, ObjectNode> memo)
     {
-        if (obj.IsFree)
+        if (obj.IsFree || obj.IsNull)
         {
             return null;
         }

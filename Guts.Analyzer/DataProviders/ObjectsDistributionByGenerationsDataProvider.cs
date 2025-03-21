@@ -5,21 +5,21 @@ namespace Guts.Analyzer.DataProviders;
 public class ObjectsDistributionByGenerationsDataProvider
 {
     private readonly IClrRuntimeProvider _runtimeProvider;
-    private readonly ObjectsTreeProvider _objectsTreeProvider;
+    private readonly ObjectsTreeFactory _objectsTreeFactory;
 
     public ObjectsDistributionByGenerationsDataProvider(
         IClrRuntimeProvider runtimeProvider,
-        ObjectsTreeProvider objectsTreeProvider)
+        ObjectsTreeFactory objectsTreeFactory)
     {
         _runtimeProvider = runtimeProvider;
-        _objectsTreeProvider = objectsTreeProvider;
+        _objectsTreeFactory = objectsTreeFactory;
     }
 
     public IReadOnlyDictionary<Generation, IReadOnlyList<(MemoryRange GenerationRange, IReadOnlyList<ClrObject> ObjectsRanges)>> Get()
     {
         var heap = _runtimeProvider.GetCurrentDumpRuntime().Heap;
         var generationsRanges = new Dictionary<Generation, List<(MemoryRange, IReadOnlyList<ClrObject>)>>();
-        var objectsTree = _objectsTreeProvider.Get();
+        var objectsTree = _objectsTreeFactory.GetTree();
 
         foreach (var segmentGenerationRanges in heap.Segments.Select(GetGenerationsRangesBySegment))
         {
