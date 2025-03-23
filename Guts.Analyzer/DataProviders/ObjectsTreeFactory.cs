@@ -15,6 +15,9 @@ public class ObjectsTreeFactory
 
     private static ObjectsTree BuildTree(ClrHeap heap)
     {
+        var domTree = new DominatorTreeBuilder();
+        domTree.Build(heap);
+        
         var visited = new HashSet<ulong>();
         var memo = new Dictionary<ulong, ObjectNode>();
         var roots = heap
@@ -28,7 +31,7 @@ public class ObjectsTreeFactory
 
     private static ObjectNode? GetObjectNode(ClrObject obj, HashSet<ulong> visited, Dictionary<ulong, ObjectNode> memo)
     {
-        if (obj.IsFree || obj.IsNull)
+        if (obj.IsFree)
         {
             return null;
         }
@@ -40,7 +43,7 @@ public class ObjectsTreeFactory
         
         var children = new List<ObjectNode>();
         
-        var currentNode = new ObjectNode(obj, children);
+        var currentNode = new ObjectNode(obj, children, 0);
         memo[obj] = currentNode;
 
         children.AddRange(

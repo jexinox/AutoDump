@@ -15,7 +15,7 @@ public class TypesBySizeTopStatProvider
     public IEnumerable<(string Type, ulong OccupiedSize)> Get()
     {
         var result = new Dictionary<string, ulong>();
-        var objectsAndTypes = _objectsTreeFactory.GetTree().ObjectNodes.Values
+        var objectsAndTypes = _objectsTreeFactory.GetTree()
             .Select(node => (node.Object, node.Object.Type?.Name))
             .Where(pair => pair.Name is not null)
             .OfType<(ClrObject, string)>();

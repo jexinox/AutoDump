@@ -22,101 +22,190 @@
 //     [3],
 //     [5]
 // ];
-var n = succ.Count - 1;
+var tree = DominatorTree.Create(succ);
+tree.Iterate();
 
-var parent = new int[n + 1];
-var dom = new int[n + 1];
-var vertex = new int[n + 1];
-var ancestor = new int[n + 1];
-
-var semi = new int[n + 1];
-var label = new int[n + 1];
-
-var pred = new List<List<int>> { new(), new(), new(), new(), new(), new(), new(), new(), new(), new() };
-var bucket = new List<List<int>> { new(), new(), new(), new(), new(), new(), new(), new(), new(), new() };
-var color = 0;
-Dfs(1);
-for (var i = n; i > 1; i--)
+public class DominatorTree
 {
-    var w = vertex[i];
-    foreach (var v in pred[w])
+    private readonly Vertex[] _vertices;
+    
+    private readonly int[] _originalNumByTimeIn;
+
+    private readonly List<List<int>> _originalLinksList;
+    private readonly int _nodesCount;
+
+    private DominatorTree(Vertex[] vertices, int[] originalNumByTimeIn, List<List<int>> originalLinksList, int nodesCount)
     {
-        var u = Eval(v);
-        if (semi[u] < semi[w])
+        _vertices = vertices;
+        _originalNumByTimeIn = originalNumByTimeIn;
+
+        _originalLinksList = originalLinksList;
+        _nodesCount = nodesCount;
+    }
+
+    public static DominatorTree Create(List<List<int>> originalLinksList)
+    {
+        var n = originalLinksList.Count;
+        var vertices = new Vertex[n];
+        for (var i = 0; i < n; i++)
         {
-            semi[w] = semi[u];
+            vertices[i] = new();
         }
+        
+        return new(vertices, new int[n], originalLinksList, n);
     }
-    bucket[vertex[semi[w]]].Add(w);
-    Link(parent[w], w);
-    foreach (var v in bucket[parent[w]])
+
+    public void Iterate()
     {
-        var u = Eval(v);
-        dom[v] = semi[u] < semi[v] ? u : parent[w];
-    }
-}
+        var reachableVertices = new HashSet<int>();
+        NumerateVerticesWithTimeInByDfs(1, new(), reachableVertices);
 
-for (var i = 2; i <= n; i++)
-{
-    var w = vertex[i];
-    if (dom[w] != vertex[semi[w]])
-    {
-        dom[w] = dom[dom[w]];
-    }
-}
-
-dom[0] = 0;
-
-foreach (var dominator in dom)
-{
-    Console.WriteLine(dominator);
-}
-
-return;
-
-void Dfs(int v)
-{
-    semi[v] = ++color;
-    label[v] = v;
-    vertex[color] = v;
-    ancestor[v] = 0;
-    foreach (var w in succ[v])
-    {
-        if (semi[w] == 0)
+        var linkEval = UnbalancedLinkEvalTree.Create(_nodesCount, reachableVertices, vertex => _vertices[vertex].Semidominator);
+        for (var i = _nodesCount - 1; i > 1; i--)
         {
-            parent[w] = v;
-            Dfs(w);
-        }
-        pred[w].Add(v);
-    }
-}
-
-void Compress(int v)
-{
-    if (ancestor[ancestor[v]] != 0)
-    {
-        Compress(ancestor[v]);
-        if (semi[label[ancestor[v]]] < semi[label[v]])
-        {
-            label[v] = label[ancestor[v]];
+            var w = _originalNumByTimeIn[i];
+            foreach (var u in _vertices[w].Predecessors
+                         .Select(v => linkEval.Eval(v))
+                         .Where(u => _vertices[u].Semidominator < _vertices[w].Semidominator))
+            {
+                _vertices[w].Semidominator = _vertices[u].Semidominator;
+            }
+            _vertices[_originalNumByTimeIn[_vertices[w].Semidominator]].Bucket.Add(w);
+            linkEval.Link(_vertices[w].Parent, w);
+            foreach (var v in _vertices[_vertices[w].Parent].Bucket)
+            {
+                var u = linkEval.Eval(v);
+                _vertices[v].Dominator = 
+                    _vertices[u].Semidominator < _vertices[v].Semidominator 
+                        ? u 
+                        : _vertices[w].Parent;
+            }
         }
 
-        ancestor[v] = ancestor[ancestor[v]];
-    }
-}
+        for (var i = 2; i < _nodesCount; i++)
+        {
+            var w = _originalNumByTimeIn[i];
+            if (_vertices[w].Dominator != _originalNumByTimeIn[_vertices[w].Semidominator])
+            {
+                _vertices[w].Dominator = _vertices[_vertices[w].Dominator].Dominator;
+            }
+        }
 
-int Eval(int v)
-{
-    if (ancestor[v] == 0)
+        _vertices[1].Dominator = 0;
+        
+        foreach (var dominator in _vertices.Select(vertex => vertex.Dominator).Skip(1))
+        {
+            Console.WriteLine(dominator);
+        }
+    }
+    
+    private void NumerateVerticesWithTimeInByDfs(int v, VerticesNumerator numerator, HashSet<int> reachable)
     {
-        return v;
+        _vertices[v].Semidominator = numerator.AssignNewNumber();
+        reachable.Add(v);
+        _originalNumByTimeIn[numerator.Value] = v;
+        foreach (var w in _originalLinksList[v])
+        {
+            if (_vertices[w].Semidominator == 0)
+            {
+                _vertices[w].Parent = v;
+                NumerateVerticesWithTimeInByDfs(w, numerator, reachable);
+            }
+            _vertices[w].Predecessors.Add(v);
+        }
     }
+    
+    private class Vertex
+    {
+        public int Dominator;
 
-    Compress(v);
-    return label[v];
+        public int Semidominator;
+
+        public int Parent;
+        
+        public readonly List<int> Predecessors = new();
+        
+        public readonly List<int> Bucket = new();
+    }
+    
+    private class VerticesNumerator
+    {
+        public int Value { get; private set; }
+
+        public int AssignNewNumber() => ++Value;
+    }
 }
 
-void Link(int v, int w)
+public class UnbalancedLinkEvalTree
 {
-    ancestor[w] = v;
+    private readonly LinkEvalVertex[] _tree;
+    private readonly Func<int, int> _evalFunction;
+    
+    private UnbalancedLinkEvalTree(LinkEvalVertex[] tree, Func<int, int> evalFunction)
+    {
+        _tree = tree;
+        _evalFunction = evalFunction;
+    }
+    
+    public static UnbalancedLinkEvalTree Create(int verticesCount, ISet<int> reachableVertices, Func<int, int> evalFunction)
+    {
+        var tree = new LinkEvalVertex[verticesCount];
+
+        for (var i = 1; i < verticesCount; i++)
+        {
+            if (reachableVertices.Contains(i))
+            {
+                tree[i] = new()
+                {
+                    Vertex = i,
+                    Label = i,
+                    Ancestor = new() { Vertex = 0 }
+                };
+            }
+        }
+        
+        return new(tree, evalFunction);
+    }
+    
+    public int Eval(int v)
+    {
+        var vertex = _tree[v];
+        if (vertex.Ancestor.Vertex == 0)
+        {
+            return v;
+        }
+
+        Compress(vertex);
+        return vertex.Label;
+    }
+
+    public void Link(int v, int w)
+    {
+        _tree[w].Ancestor = _tree[v];
+    }
+    
+    private void Compress(LinkEvalVertex v)
+    {
+        if (v.Ancestor.Ancestor.Vertex == 0)
+        {
+            return;
+        }
+        
+        Compress(v.Ancestor);
+        if (_evalFunction(v.Ancestor.Label) < _evalFunction(v.Label))
+        {
+            v.Label = v.Ancestor.Label;
+        }
+
+        v.Ancestor = v.Ancestor.Ancestor;
+    }
+    
+    private class LinkEvalVertex
+    {
+        public int Vertex;
+
+        public int Label;
+        
+        public LinkEvalVertex Ancestor = null!;
+    }
 }

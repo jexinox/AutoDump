@@ -25,7 +25,7 @@ public class ObjectsDistributionByGenerationsDataProvider
         {
             foreach (var (generation, memoryRange) in segmentGenerationRanges)
             {
-                var objects = GetObjectsInMemoryRange(memoryRange, heap, objectsTree.ObjectNodes.ContainsKey);
+                var objects = GetObjectsInMemoryRange(memoryRange, heap, objectsTree.ContainsObject);
                 if (generationsRanges.TryGetValue(generation, out var generationRanges))
                 {
                     generationRanges.Add(new(memoryRange, objects));
