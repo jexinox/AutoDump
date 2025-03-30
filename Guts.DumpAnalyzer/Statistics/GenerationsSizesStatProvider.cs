@@ -1,7 +1,7 @@
-﻿using Guts.Analyzer.DataProviders;
+﻿using Guts.DumpAnalyzer.DataProviders;
 using Microsoft.Diagnostics.Runtime;
 
-namespace Guts.Analyzer.Statistics;
+namespace Guts.DumpAnalyzer.Statistics;
 
 public class GenerationsSizesStatProvider
 {

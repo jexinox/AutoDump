@@ -1,6 +1,6 @@
-﻿using Guts.Analyzer.DataProviders;
+﻿using Guts.DumpAnalyzer.DataProviders;
 
-namespace Guts.Analyzer.Statistics;
+namespace Guts.DumpAnalyzer.Statistics;
 
 public class TypesByRetainedSizeTopStatProvider
 {

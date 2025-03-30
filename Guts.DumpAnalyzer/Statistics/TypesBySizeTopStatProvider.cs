@@ -1,7 +1,6 @@
-﻿using Guts.Analyzer.DataProviders;
-using Microsoft.Diagnostics.Runtime;
+﻿using Guts.DumpAnalyzer.DataProviders;
 
-namespace Guts.Analyzer.Statistics;
+namespace Guts.DumpAnalyzer.Statistics;
 
 public class TypesBySizeTopStatProvider
 {
@@ -16,14 +15,14 @@ public class TypesBySizeTopStatProvider
     {
         var result = new Dictionary<string, ulong>();
         var objectsAndTypes = _objectsTreeFactory.GetTree()
-            .Select(node => (node.Object, node.Object.Type?.Name))
+            .Select(node => (node.Object.Size, node.Object.Type?.Name))
             .Where(pair => pair.Name is not null)
-            .OfType<(ClrObject, string)>();
-        foreach (var (obj, typeName) in objectsAndTypes)
+            .OfType<(ulong, string)>();
+        foreach (var (size, typeName) in objectsAndTypes)
         {
             result[typeName] = result.TryGetValue(typeName, out var occupiedSize) 
-                ? occupiedSize + obj.Size 
-                : obj.Size;
+                ? occupiedSize + size
+                : size;
         }
         
         return result

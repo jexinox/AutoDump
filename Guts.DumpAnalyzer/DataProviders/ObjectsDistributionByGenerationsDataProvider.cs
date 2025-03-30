@@ -1,6 +1,6 @@
 using Microsoft.Diagnostics.Runtime;
 
-namespace Guts.Analyzer.DataProviders;
+namespace Guts.DumpAnalyzer.DataProviders;
 
 public class ObjectsDistributionByGenerationsDataProvider
 {

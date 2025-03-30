@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.Server", "Guts.Server\Guts.Server.csproj", "{AC074247-0545-4BF4-A78F-FA10162A7DBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.Analyzer", "Guts.Analyzer\Guts.Analyzer.csproj", "{8BD684A5-948E-409C-B893-508DB0F745A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.DumpAnalyzer", "Guts.DumpAnalyzer\Guts.DumpAnalyzer.csproj", "{8BD684A5-948E-409C-B893-508DB0F745A1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sln Items", "Sln Items", "{D5DD1E7F-8A56-4EAD-94A2-F8EB5DE012C3}"
 	ProjectSection(SolutionItems) = preProject
