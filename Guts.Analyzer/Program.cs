@@ -1,4 +1,5 @@
-﻿using Guts.Analyzer;
+﻿using System.Diagnostics;
+using Guts.Analyzer;
 using Guts.Analyzer.DataProviders;
 using Guts.Analyzer.Statistics;
 using Microsoft.Diagnostics.Runtime;
@@ -13,6 +14,8 @@ var objectsDistributionDataProvider = new ObjectsDistributionByGenerationsDataPr
 var generationsSizesDataProvider = new GenerationsSizesStatProvider(objectsDistributionDataProvider);
 var typesBySizeTopStatProvider = new TypesBySizeTopStatProvider(objectsTreeProvider);
 var typesByRetainedSizeTopStatProvider = new TypesByRetainedSizeTopStatProvider(objectsTreeProvider);
+
+var stopwatch = Stopwatch.StartNew();
 
 Console.WriteLine($"Is server: {clr.Heap.IsServer}");
 Console.WriteLine($"Uses regions: {clr.Heap.Segments.Any(segment => segment.Kind is GCSegmentKind.Generation0 or GCSegmentKind.Generation1)}");
@@ -37,3 +40,11 @@ foreach (var (type, size) in typesByRetainedSizeTopStatProvider.Get().Take(10))
 {
     Console.WriteLine($"Type: {type}, Size (B): {size}, Size (KB): {size / 1024d}, Size (MB): {size / 1024d / 1024d}");
 }
+
+foreach (var (threadId, exception) in new UnhandledExceptionsProvider().Get(clr))
+{
+    Console.WriteLine($"ThreadId: {threadId}, Exception: {exception}");
+}
+
+stopwatch.Stop();
+Console.WriteLine(stopwatch.Elapsed.Seconds);

@@ -14,27 +14,18 @@ public class TypesByRetainedSizeTopStatProvider
     public IEnumerable<(string Type, ulong Used)> Get()
     {
         var tree = _factory.GetTree();
-        var objectsNumbers = new Dictionary<ulong, ulong>();
-        var visited = new HashSet<ulong>();
-        foreach (var root in tree.Roots)
-        {
-            NumerateObjects(root, visited, objectsNumbers, 1);
-        }
 
-        return new (string Type, ulong Used)[1];
-    }
-
-    private static void NumerateObjects(ObjectNode node, HashSet<ulong> visited, Dictionary<ulong, ulong> objectsNumbers, ulong number)
-    {
-        if (!visited.Add(node.Object))
-        {
-            return;
-        }
-        
-        objectsNumbers[node.Object] = number;
-        foreach (var child in node.Children)
-        {
-            NumerateObjects(child, visited, objectsNumbers, ++number);
-        }
+        return tree
+            .Roots
+            .Select(node => (node.Object.Type?.Name, node.RetainedSize))
+            .Where(pair => pair.Name is not null)
+            .OfType<(string Name, ulong Retained)>()
+            .GroupBy(pair => pair.Name)
+            .Select(group => (
+                Name: group.Key,
+                Retained: group
+                    .Select(dominator => dominator.Retained)
+                    .Aggregate(0ul, (current, size) => current + size)))
+            .OrderByDescending(group => group.Retained);
     }
 }

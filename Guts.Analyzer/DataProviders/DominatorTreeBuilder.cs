@@ -7,67 +7,69 @@ public class DominatorTreeBuilder
     private readonly Dictionary<ulong, Vertex> _vertices = new();
     private readonly Dictionary<int, ulong> _originalByTimeIn = new();
         
-    public IReadOnlyDictionary<ulong, List<ulong>> Build(ClrHeap heap)
+    public ILookup<ulong, ulong> Build(ClrHeap heap)
     {
         var roots = heap.EnumerateRoots().ToList();
         var numerator = new VerticesNumerator();
-        foreach (var root in roots)
+        var rootNum = numerator.AssignNewNumber();
+        _vertices[1] = new() { Semidominator = rootNum, Original = new(1, null)};
+        _originalByTimeIn[rootNum] = 1;
+        foreach (var rootObj in roots
+                     .Select(root => root.Object)
+                     .Where(rootObj => !_vertices.ContainsKey(rootObj.Address)))
         {
-            var rootObj = root.Object;
-            if (!_vertices.ContainsKey(rootObj.Address))
-            {
-                NumerateVerticesWithTimeInByDfs(rootObj, numerator);
-            }
+            NumerateVerticesWithTimeInByDfs(rootObj, numerator);
+            _vertices[rootObj].Parent = 1;
+            _vertices[rootObj].Predecessors.Add(1);
+        }
+
+        var n = _vertices.Count;
+        var vertices = new Vertex[_vertices.Count + 1];
+        foreach (var (time, orig) in _originalByTimeIn)
+        {
+            vertices[time] = _vertices[orig];
         }
         
-        var n = _vertices.Count;
-        var linkEvalTree = new UnbalancedLinkEvalTree(address => _vertices[address].Semidominator);
+        var linkEvalTree = new UnbalancedLinkEvalTree(vertices, address => vertices[address].Semidominator);
         for (var i = n - 1; i > 1; i--)
         {
-            var w = _originalByTimeIn[i];
-            foreach (var u in _vertices[w].Predecessors
+            var w = i;
+            foreach (var u in vertices[w].Predecessors
                          .Select(linkEvalTree.Eval)
-                         .Where(u => _vertices[u].Semidominator < _vertices[w].Semidominator))
+                         .Where(u => vertices[u].Semidominator < vertices[w].Semidominator))
             {
-                _vertices[w].Semidominator = _vertices[u].Semidominator;
+                vertices[w].Semidominator = vertices[u].Semidominator;
             }
-            _vertices[_originalByTimeIn[_vertices[w].Semidominator]].Bucket.Add(w);
-            linkEvalTree.Link(_vertices[w].Parent, w);
-            foreach (var v in _vertices[_vertices[w].Parent].Bucket)
+            
+            vertices[vertices[w].Semidominator].Bucket.Add(w);
+            linkEvalTree.Link(vertices[w].Parent, w);
+            foreach (var v in vertices[vertices[w].Parent].Bucket)
             {
                 var u = linkEvalTree.Eval(v);
-                _vertices[v].Dominator = 
-                    _vertices[u].Semidominator < _vertices[v].Semidominator 
+                vertices[v].Dominator = 
+                    vertices[u].Semidominator < vertices[v].Semidominator 
                         ? u 
-                        : _vertices[w].Parent;
+                        : vertices[w].Parent;
             }
         }
         
         for (var i = 2; i < n; i++)
         {
-            var w = _originalByTimeIn[i];
-            if (_vertices[w].Dominator != _originalByTimeIn[_vertices[w].Semidominator])
+            if (vertices[i].Dominator != vertices[i].Semidominator)
             {
-                _vertices[w].Dominator = _vertices[_vertices[w].Dominator].Dominator;
+                vertices[i].Dominator = vertices[vertices[i].Dominator].Dominator;
             }
         }
 
-        _vertices[_originalByTimeIn[1]].Dominator = 0;
-
-        var dominatorTree = new Dictionary<ulong, List<ulong>>();
-        foreach (var (obj, vertex) in _vertices)
+        var dominatorTree = new List<(ulong Parent, ulong Child)>(n * 2);
+        for (var i = 2; i < n; i++)
         {
-            if (dominatorTree.TryGetValue(vertex.Dominator, out var dominatorRefs))
-            {
-                dominatorRefs.Add(obj);
-            }
-            else
-            {
-                dominatorTree[vertex.Dominator] = [obj];
-            }
+            var vertex = vertices[i];
+            
+            dominatorTree.Add((vertices[vertex.Dominator].Original, vertex.Original));
         }
 
-        return dominatorTree;
+        return dominatorTree.ToLookup(kvp => kvp.Parent, kvp => kvp.Child);
     }
     
     private void NumerateVerticesWithTimeInByDfs(
@@ -75,27 +77,20 @@ public class DominatorTreeBuilder
         VerticesNumerator numerator)
     {
         var nodeNumber = numerator.AssignNewNumber();
-        if (_vertices.TryGetValue(currentObj, out var vertex))
-        {
-            vertex.Semidominator = nodeNumber;    
-        }
-        else
-        {
-            _vertices[currentObj] = new() { Semidominator = nodeNumber};
-        }
+        _vertices[currentObj] = new() { Semidominator = nodeNumber, Original = currentObj};
         
         _originalByTimeIn[nodeNumber] = currentObj;
         foreach (var child in currentObj.EnumerateReferences())
         {
-            if (child.IsFree) continue;
+            if (child.IsFree || child.IsNull) continue;
             
             if (!_vertices.ContainsKey(child))
             {
                 NumerateVerticesWithTimeInByDfs(child, numerator);
-                _vertices[child].Parent = currentObj;
+                _vertices[child].Parent = nodeNumber;
             }
             
-            _vertices[child].Predecessors.Add(currentObj);
+            _vertices[child].Predecessors.Add(nodeNumber);
         }
     }
     
@@ -108,84 +103,78 @@ public class DominatorTreeBuilder
     
     private class Vertex
     {
-        public ulong Dominator;
+        public ClrObject Original;
+        
+        public int Dominator;
 
         public int Semidominator;
 
-        public ulong Parent;
+        public int Parent;
         
-        public readonly List<ulong> Predecessors = new();
+        public readonly List<int> Predecessors = new();
         
-        public readonly List<ulong> Bucket = new();
+        public readonly List<int> Bucket = new();
     }
     
     private class UnbalancedLinkEvalTree
     {
-        private readonly Dictionary<ulong, LinkEvalVertex> _tree = new();
-        private readonly Func<ulong, int> _evalFunction;
+        private readonly LinkEvalVertex[] _tree;
+        private readonly Func<int, int> _evalFunction;
         
-        public UnbalancedLinkEvalTree(Func<ulong, int> evalFunction)
+        public UnbalancedLinkEvalTree(Vertex[] vertices, Func<int, int> evalFunction)
         {
+            _tree = new LinkEvalVertex[vertices.Length];
+            for (var i = 1; i < vertices.Length; i++)
+            {
+                _tree[i] = new()
+                {
+                    Label = vertices[i].Semidominator,
+                    Ancestor = 0
+                };
+            }
+            
             _evalFunction = evalFunction;
         }
         
-        public ulong Eval(ulong v)
+        public int Eval(int v)
         {
-            var vertex = GetOrCreateVertex(v);
-            if (vertex.Ancestor.Object == 0)
+            ref var vertex = ref _tree[v];
+            if (vertex.Ancestor == 0)
             {
                 return v;
             }
     
-            Compress(vertex);
+            Compress(ref vertex);
             return vertex.Label;
         }
     
-        public void Link(ulong v, ulong w)
+        public void Link(int v, int w)
         {
-            var linkEvalV = GetOrCreateVertex(v);
-            var linkEvalW = GetOrCreateVertex(w);
-            linkEvalW.Ancestor = linkEvalV;
+            _tree[w].Ancestor = v;
         }
         
-        private void Compress(LinkEvalVertex v)
+        private void Compress(ref LinkEvalVertex v)
         {
-            if (v.Ancestor.Ancestor.Object == 0)
+            ref var ancestor = ref _tree[v.Ancestor];
+            if (ancestor.Ancestor == 0)
             {
                 return;
             }
             
-            Compress(v.Ancestor);
-            if (_evalFunction(v.Ancestor.Label) < _evalFunction(v.Label))
+            Compress(ref ancestor);
+            if (_evalFunction(ancestor.Label) < _evalFunction(v.Label))
             {
-                v.Label = v.Ancestor.Label;
+                v.Label = ancestor.Label;
             }
     
-            v.Ancestor = v.Ancestor.Ancestor;
-        }
-
-        private LinkEvalVertex GetOrCreateVertex(ulong address)
-        {
-            if (_tree.TryGetValue(address, out var vertex))
-            {
-                return vertex;
-            }
-            
-            return _tree[address] = new()
-            {
-                Object = address,
-                Label = address,
-                Ancestor = new() { Object = 0 }
-            };
+            v.Ancestor = ancestor.Ancestor;
         }
         
-        private class LinkEvalVertex
+        private struct LinkEvalVertex
         {
-            public ulong Object;
-    
-            public ulong Label;
-            
-            public LinkEvalVertex Ancestor = null!;
+            public int Label;
+
+            public int Ancestor;
         }
     }
 }

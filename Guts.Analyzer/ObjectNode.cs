@@ -1,4 +1,5 @@
-﻿using Microsoft.Diagnostics.Runtime;
+﻿using System.Collections;
+using Microsoft.Diagnostics.Runtime;
 
 namespace Guts.Analyzer;
 

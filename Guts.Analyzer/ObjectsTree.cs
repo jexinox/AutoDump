@@ -4,19 +4,35 @@ namespace Guts.Analyzer;
 
 public class ObjectsTree : IEnumerable<ObjectNode>
 {
-    private readonly IReadOnlyDictionary<ulong, ObjectNode> _objectNodes;
+    private readonly Func<ulong, bool> _isContained;
     
-    public ObjectsTree(IReadOnlyList<ObjectNode> roots, IReadOnlyDictionary<ulong, ObjectNode> objectNodes)
+    public ObjectsTree(IReadOnlyList<ObjectNode> roots, Func<ulong, bool> isContained)
     {
+        _isContained = isContained;
         Roots = roots;
-        _objectNodes = objectNodes;
     }
 
     public IReadOnlyList<ObjectNode> Roots { get; }
 
-    public bool ContainsObject(ulong objectAddress) => _objectNodes.ContainsKey(objectAddress);
+    public bool ContainsObject(ulong objectAddress) => _isContained(objectAddress);
     
-    public IEnumerator<ObjectNode> GetEnumerator() => _objectNodes.Values.GetEnumerator();
+    public IEnumerator<ObjectNode> GetEnumerator()
+    {
+        var queue = new Queue<ObjectNode>(Roots);
+        
+        while (queue.Count != 0)
+        {
+            var current = queue.Dequeue();
+            yield return current;
+            foreach (var child in current.Children)
+            {
+                queue.Enqueue(child);
+            }
+        }
+    }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }

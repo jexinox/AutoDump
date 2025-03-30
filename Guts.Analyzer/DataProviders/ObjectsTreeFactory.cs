@@ -15,43 +15,25 @@ public class ObjectsTreeFactory
 
     private static ObjectsTree BuildTree(ClrHeap heap)
     {
-        var domTree = new DominatorTreeBuilder();
-        domTree.Build(heap);
+        var domTree = new DominatorTreeBuilder().Build(heap);
         
         var visited = new HashSet<ulong>();
-        var memo = new Dictionary<ulong, ObjectNode>();
-        var roots = heap
-            .EnumerateRoots()
-            .Select(root => GetObjectNode(root.Object, visited, memo))
-            .OfType<ObjectNode>()
-            .ToList();
+        var root = GetObjectNode(1, heap, domTree, visited);
 
-        return new(roots, memo);
+        return new(root.Children, visited.Contains);
     }
 
-    private static ObjectNode? GetObjectNode(ClrObject obj, HashSet<ulong> visited, Dictionary<ulong, ObjectNode> memo)
+    private static ObjectNode GetObjectNode(ulong objAddress, ClrHeap heap, ILookup<ulong, ulong> domTree, HashSet<ulong> visited)
     {
-        if (obj.IsFree)
-        {
-            return null;
-        }
-        
-        if (!visited.Add(obj))
-        {
-            return memo[obj];
-        }
-        
-        var children = new List<ObjectNode>();
-        
-        var currentNode = new ObjectNode(obj, children, 0);
-        memo[obj] = currentNode;
+        visited.Add(objAddress);
+        var children = domTree[objAddress]
+            .Select(reference => GetObjectNode(reference, heap, domTree, visited))
+            .ToList();
 
-        children.AddRange(
-            obj
-                .EnumerateReferences()
-                .Select(reference => GetObjectNode(reference, visited, memo))
-                .OfType<ObjectNode>());
+        var currentObject = heap.GetObject(objAddress);
+        var retainedSize = (currentObject == 1 ? 0 : currentObject.Size) +
+                           children.Aggregate(0ul, (accumulator, currChild) => accumulator + currChild.RetainedSize);
 
-        return currentNode;
+        return new(currentObject, children, retainedSize);
     }
 }
