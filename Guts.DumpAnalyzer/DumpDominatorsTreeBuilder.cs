@@ -45,7 +45,7 @@ internal class DumpDominatorsTreeBuilder
             var children = dominator.Children.Select(ConvertNode).ToList();
             return new(
                 dominator.DumpObject, 
-                dominator.DumpObject.Object.Size + children.Aggregate(0ul, (current, child) => current + child.RetainedSize),
+                dominator.DumpObject.Size + children.Aggregate(0ul, (current, child) => current + child.RetainedSize),
                 children);
         }
     }
@@ -66,7 +66,7 @@ internal class DumpDominatorsTreeBuilder
     {
         var vertices = new Vertex[n + FakeRoot + 1];
         var visited = new HashSet<DumpObject>();
-        vertices[FakeRoot] = new() { Semidominator = FakeRoot, Original = new(default, [], FakeRoot)};
+        vertices[FakeRoot] = new() { Semidominator = FakeRoot, Original = null! };
         foreach (var root in dumpObjectsTree.Roots.Where(visited.Add))
         {
             InitChildrenWithDfs(root, visited, vertices);

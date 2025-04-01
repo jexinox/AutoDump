@@ -23,8 +23,6 @@ public class Dump
     
     public DumpDominatorsTree GetDominatorsTree() => DumpDominatorsTree.Create(Tree);
 
-    // public Generations GetGenerations();
-
     public UnhandledExceptions GetUnhandledExceptions()
     {
         return new(
@@ -33,7 +31,6 @@ public class Dump
                 .Where(thread => thread.CurrentException is not null)
                 .Select(thread => new UnhandledException(
                     thread.ManagedThreadId,
-                    thread.CurrentException!.ToString()))
-                .ToList());
+                    thread.CurrentException!.ToString())));
     }
 }
