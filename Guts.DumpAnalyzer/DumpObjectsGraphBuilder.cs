@@ -3,7 +3,7 @@ using Microsoft.Diagnostics.Runtime;
 
 namespace Guts.DumpAnalyzer;
 
-internal class DumpObjectsTreeBuilder
+internal class DumpObjectsGraphBuilder
 {
     private readonly Dictionary<ulong, DumpObject> _builtObjects = new();
     private readonly HashSet<ClrSegment> _visitedSegments = [];
@@ -20,14 +20,14 @@ internal class DumpObjectsTreeBuilder
     
     private readonly ClrHeap _heap;
 
-    public DumpObjectsTreeBuilder(ClrHeap heap)
+    public DumpObjectsGraphBuilder(ClrHeap heap)
     {
         _heap = heap;
     }
     
     private int _globalNodeNumber = DumpDominatorsTreeBuilder.FakeRoot;
 
-    public DumpObjectsTree Build()
+    public DumpObjectsGraph Build()
     {
         var dumpObjectRoots = new List<DumpObject>();
         foreach (var root in _heap.EnumerateRoots())

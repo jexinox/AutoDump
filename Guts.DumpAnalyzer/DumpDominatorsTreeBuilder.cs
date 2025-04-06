@@ -4,10 +4,10 @@ internal class DumpDominatorsTreeBuilder
 {
     internal const int FakeRoot = 1; // DON'T CHANGE TO ZERO
     
-    public DumpDominatorsTree Build(DumpObjectsTree dumpObjectsTree)
+    public DumpDominatorsTree Build(DumpObjectsGraph dumpObjectsGraph)
     {
-        var n = dumpObjectsTree.Count;
-        var vertices = InitializeVertices(n, dumpObjectsTree);
+        var n = dumpObjectsGraph.Count;
+        var vertices = InitializeVertices(n, dumpObjectsGraph);
         CalculateDominators(vertices);
         return BuildDominatorsTree(vertices);
     }
@@ -62,12 +62,12 @@ internal class DumpDominatorsTreeBuilder
         public readonly List<MutableDumpDominator> Children = [];
     }
     
-    private static Vertex[] InitializeVertices(int n, DumpObjectsTree dumpObjectsTree)
+    private static Vertex[] InitializeVertices(int n, DumpObjectsGraph dumpObjectsGraph)
     {
         var vertices = new Vertex[n + FakeRoot + 1];
         var visited = new HashSet<DumpObject>();
         vertices[FakeRoot] = new() { Semidominator = FakeRoot, Original = null! };
-        foreach (var root in dumpObjectsTree.Roots.Where(visited.Add))
+        foreach (var root in dumpObjectsGraph.Roots.Where(visited.Add))
         {
             InitChildrenWithDfs(root, visited, vertices);
             vertices[root.NumberByTimeInDfs].Parent = FakeRoot;

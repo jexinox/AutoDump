@@ -6,22 +6,22 @@ public class Dump
 {
     private readonly ClrRuntime _runtime;
 
-    private Dump(ClrRuntime runtime, DumpObjectsTree tree)
+    private Dump(ClrRuntime runtime, DumpObjectsGraph graph)
     {
         _runtime = runtime;
-        Tree = tree;
+        Graph = graph;
     }
 
     public static Dump Create(string pathToDump)
     {
         var dataTarget = DataTarget.LoadDump(pathToDump);
         var runtime = dataTarget.ClrVersions[0].CreateRuntime();
-        return new(runtime, DumpObjectsTree.Create(runtime.Heap));
+        return new(runtime, DumpObjectsGraph.Create(runtime.Heap));
     }
 
-    public DumpObjectsTree Tree { get; }
+    public DumpObjectsGraph Graph { get; }
     
-    public DumpDominatorsTree GetDominatorsTree() => DumpDominatorsTree.Create(Tree);
+    public DumpDominatorsTree GetDominatorsTree() => DumpDominatorsTree.Create(Graph);
 
     public UnhandledExceptions GetUnhandledExceptions()
     {

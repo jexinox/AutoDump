@@ -9,5 +9,5 @@ public class DumpDominatorsTree
 
     public IReadOnlyList<DumpDominator> Roots { get; }
     
-    public static DumpDominatorsTree Create(DumpObjectsTree tree) => new DumpDominatorsTreeBuilder().Build(tree);
+    public static DumpDominatorsTree Create(DumpObjectsGraph graph) => new DumpDominatorsTreeBuilder().Build(graph);
 }
