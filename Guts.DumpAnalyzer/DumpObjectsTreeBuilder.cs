@@ -49,7 +49,7 @@ internal class DumpObjectsTreeBuilder
         ClrObject currentObject,
         [NotNullWhen(true)] out DumpObject? dumpObject)
     {
-        if (currentObject.IsFree || currentObject.IsNull)
+        if (currentObject.IsNull)
         {
             dumpObject = null;
             return false;
@@ -85,9 +85,6 @@ internal class DumpObjectsTreeBuilder
     {
         var genSizeInfo = _generationsSizeInfos[dumpObject.GenerationType];
         
-        genSizeInfo.Total += _visitedSegments.Add(dumpObject.Segment) 
-            ? dumpObject.Segment.CommittedMemory.Length 
-            : 0;
         genSizeInfo.Used += dumpObject.Size;
     }
 
