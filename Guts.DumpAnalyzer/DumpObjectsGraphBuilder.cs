@@ -37,6 +37,20 @@ internal class DumpObjectsGraphBuilder
                 dumpObjectRoots.Add(rootDumpObject);
             }
         }
+
+        foreach (var segment in _heap.Segments)
+        {
+            if (segment.Kind == GCSegmentKind.Ephemeral)
+            {
+                _generationsSizeInfos[GenerationType.Generation0].Total += segment.Generation0.Length;
+                _generationsSizeInfos[GenerationType.Generation1].Total += segment.Generation0.Length;
+                _generationsSizeInfos[GenerationType.Generation2].Total += segment.Generation0.Length;
+            }
+            else
+            {
+                _generationsSizeInfos[NonEphemeralSegmentKindToGenerationType(segment.Kind)].Total += segment.Length;
+            }
+        }
             
         return new(
             dumpObjectRoots,
@@ -86,6 +100,20 @@ internal class DumpObjectsGraphBuilder
         var genSizeInfo = _generationsSizeInfos[dumpObject.GenerationType];
         
         genSizeInfo.Used += dumpObject.Size;
+    }
+
+    private static GenerationType NonEphemeralSegmentKindToGenerationType(GCSegmentKind segmentKind)
+    {
+        return segmentKind switch
+        {
+            GCSegmentKind.Generation0 => GenerationType.Generation0,
+            GCSegmentKind.Generation1 => GenerationType.Generation1,
+            GCSegmentKind.Generation2 => GenerationType.Generation2,
+            GCSegmentKind.Large => GenerationType.Large,
+            GCSegmentKind.Pinned => GenerationType.Pinned,
+            GCSegmentKind.Frozen => GenerationType.Frozen,
+            _ => throw new ArgumentException($"Unknown segment kind: {segmentKind}"),
+        };
     }
 
     private class MutableGenerationSizeInfo
