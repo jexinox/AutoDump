@@ -1,3 +1,3 @@
 ﻿namespace Guts.Server.Dumps.FeatureModels;
 
-public record DumpMetadata(string HostName, string FileName, DateTimeOffset TimeStamp);
+public record DumpMetadata(string Locator, string FileName, DateTimeOffset TimeStamp);
