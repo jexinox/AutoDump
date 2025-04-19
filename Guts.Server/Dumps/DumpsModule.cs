@@ -1,7 +1,5 @@
 ﻿using Guts.Server.CQRS;
 using Guts.Server.Dumps.FeatureModels;
-using Guts.Server.Dumps.Repositories;
-using Guts.Server.Dumps.Repositories.Mongo;
 using Guts.Server.Dumps.Upload;
 using Guts.Server.Modules;
 using Kontur.Results;
@@ -19,11 +17,6 @@ public class DumpsModule : IApiModule
             new MongoUrl("mongodb://localhost:27017/?readPreference=primary&appname=guts.server&directConnection=true&ssl=false")));
 
         serviceCollection.AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase("Guts"));
-
-        serviceCollection.AddScoped<IMongoCollection<MongoDumpMetadata>>(
-            sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<MongoDumpMetadata>("DumpsMeta"));
-        
-        serviceCollection.AddScoped<IDumpsRepository, MongoDbDumpsRepository>();
         
         serviceCollection.AddScoped<
             ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>>, UploadDumpMetadataHandler>();

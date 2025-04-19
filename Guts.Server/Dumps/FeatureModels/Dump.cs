@@ -1,3 +1,3 @@
 ﻿namespace Guts.Server.Dumps.FeatureModels;
 
-public record DumpArchive(Stream Stream);
+public record Dump(Stream Stream);

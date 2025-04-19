@@ -4,13 +4,19 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Kontur.Results" Version="3.0.0" />
       <PackageReference Include="Kontur.Results.Monad" Version="3.0.0" />
-      <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
-      <PackageReference Include="MongoDB.Driver.GridFS" Version="2.24.0" />
+      <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

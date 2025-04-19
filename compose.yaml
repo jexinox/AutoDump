@@ -1,0 +1,6 @@
+﻿services:
+  guts.server:
+    image: guts.server
+    build:
+      context: .
+      dockerfile: Guts.Server/Dockerfile
