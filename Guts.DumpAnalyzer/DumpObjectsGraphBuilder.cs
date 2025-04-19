@@ -6,10 +6,8 @@ namespace Guts.DumpAnalyzer;
 internal class DumpObjectsGraphBuilder
 {
     private readonly Dictionary<ulong, DumpObject> _builtObjects = new();
-    private readonly HashSet<ClrSegment> _visitedSegments = [];
     private readonly Dictionary<GenerationType, MutableGenerationSizeInfo> _generationsSizeInfos = new()
     {
-        [GenerationType.Unknown] = new(),
         [GenerationType.Generation0] = new(),
         [GenerationType.Generation1] = new(),
         [GenerationType.Generation2] = new(),
@@ -43,8 +41,8 @@ internal class DumpObjectsGraphBuilder
             if (segment.Kind == GCSegmentKind.Ephemeral)
             {
                 _generationsSizeInfos[GenerationType.Generation0].Total += segment.Generation0.Length;
-                _generationsSizeInfos[GenerationType.Generation1].Total += segment.Generation0.Length;
-                _generationsSizeInfos[GenerationType.Generation2].Total += segment.Generation0.Length;
+                _generationsSizeInfos[GenerationType.Generation1].Total += segment.Generation1.Length;
+                _generationsSizeInfos[GenerationType.Generation2].Total += segment.Generation2.Length;
             }
             else
             {

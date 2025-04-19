@@ -67,4 +67,4 @@ Console.WriteLine(
             .Take(10)));
 
 Console.WriteLine("Unhandled exceptions");
-Console.WriteLine(string.Join(Environment.NewLine, dump.GetUnhandledExceptions()));
+Console.WriteLine(string.Join(Environment.NewLine, dump.GetUnhandledExceptions().Exceptions));
