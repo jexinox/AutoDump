@@ -1,10 +1,9 @@
 ﻿using Guts.Server.CQRS;
 using Guts.Server.Dumps.FeatureModels;
-using Guts.Server.Dumps.Repositories;
 using Guts.Server.Dumps.Repositories.Dumps;
 using Guts.Server.Dumps.Repositories.Metadata;
-using Guts.Server.Dumps.Upload;
 using Guts.Server.Dumps.UploadDump;
+using Guts.Server.Dumps.UploadMetadata;
 using Guts.Server.Modules;
 using Kontur.Results;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -19,9 +18,6 @@ public class DumpsModule : IApiModule
     {
         //TODO: configs
         serviceCollection
-            .AddSingleton<IMongoClient>(_ => new MongoClient(
-                new MongoUrl("mongodb://localhost:27017/?readPreference=primary&appname=guts.server&directConnection=true&ssl=false")))
-            .AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase("Guts"))
             .AddScoped<IMongoCollection<MongoDumpMetadata>>(
                 sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<MongoDumpMetadata>("DumpsMeta"))
             .AddScoped<IDumpsMetadataRepository, MongoDbMetadataRepository>()
@@ -29,7 +25,7 @@ public class DumpsModule : IApiModule
                 ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>>, UploadDumpMetadataHandler>();
 
         serviceCollection
-            .AddMinio("asd", "asd")
+            .AddMinio("adminadmin", "adminadmin")
             .AddSingleton<IDumpsRepository, S3DumpsRepository>()
             .AddSingleton<ICommandHandler<UploadDumpCommand, Result<UploadDumpError>>, UploadDumpCommandHandler>();
         return serviceCollection;
@@ -56,8 +52,8 @@ public class DumpsModule : IApiModule
     {
         // TODO: faults
         var handleResult = await handler
-            .Handle(new(new(request.Locator, request.FileName, request.TimeStamp)))
-            .MapValue(id => TypedResults.CreatedAtRoute("UploadDump", new RouteValueDictionary
+            .Handle(new(new(new(request.Locator), request.FileName, request.TimeStamp)))
+            .MapValue(id => TypedResults.CreatedAtRoute(nameof(UploadDump), new RouteValueDictionary
             {
                 ["dumpId"] = id.Value 
             }))
@@ -73,7 +69,7 @@ public class DumpsModule : IApiModule
         ICommandHandler<UploadDumpCommand, Result<UploadDumpError>> handler,
         HttpContext httpContext)
     {
-        // TODO: faults
+        // TODO: faults and safety
         var handleResult = await handler
             .Handle(new(new(dumpId), new(httpContext.Request.Body)))
             .MapFault(_ => TypedResults.BadRequest());

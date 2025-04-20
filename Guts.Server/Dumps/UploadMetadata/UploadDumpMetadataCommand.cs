@@ -1,5 +1,5 @@
 ﻿using Guts.Server.Dumps.FeatureModels;
 
-namespace Guts.Server.Dumps.Upload;
+namespace Guts.Server.Dumps.UploadMetadata;
 
 public record UploadDumpMetadataCommand(DumpMetadata Metadata);

@@ -14,7 +14,7 @@ public class MongoDbMetadataRepository(
         var mongoMeta = new MongoDumpMetadata
         {
             DumpId = dumpId,
-            Locator = meta.Locator,
+            Locator = meta.Locator.Value,
             FileName = meta.FileName,
             TimeStamp = meta.TimeStamp
         };
@@ -22,5 +22,17 @@ public class MongoDbMetadataRepository(
         await collection.InsertOneAsync(mongoMeta);
         
         return new DumpId(dumpId);
+    }
+
+    public async Task<Result<RepositorySearchDumpMetadataError, IReadOnlyList<UploadedDumpMetadata>>> Search(Locator locator)
+    {
+        var searchResult = await collection.Find(meta => meta.Locator == locator.Value).ToListAsync();
+
+        return searchResult.Select(ToMetadata).ToArray();
+    }
+
+    private static UploadedDumpMetadata ToMetadata(MongoDumpMetadata meta)
+    {
+        return new(new(meta.DumpId), new(meta.Locator), meta.FileName, meta.TimeStamp);
     }
 }

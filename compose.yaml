@@ -11,6 +11,17 @@
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: admin
+      MINIO_ROOT_USER: adminadmin
+      MINIO_ROOT_PASSWORD: adminadmin
     command: server --console-address ":9001" /data
+    
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set guts http://minio:9000 adminadmin adminadmin;
+      /usr/bin/mc mb guts/guts-dumps;
+      exit 0;
+      "

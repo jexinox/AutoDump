@@ -1,9 +1,9 @@
 ﻿using Guts.Server.CQRS;
 using Guts.Server.Dumps.FeatureModels;
-using Guts.Server.Dumps.Repositories;
+using Guts.Server.Dumps.Repositories.Metadata;
 using Kontur.Results;
 
-namespace Guts.Server.Dumps.Upload;
+namespace Guts.Server.Dumps.UploadMetadata;
 
 public class UploadDumpMetadataHandler(IDumpsMetadataRepository dumpsMetadataRepository) :
     ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>>
