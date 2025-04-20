@@ -5,13 +5,15 @@ using Kontur.Results;
 
 namespace Guts.Server.Dumps.Upload;
 
-public class UploadDumpMetadataHandler(IDumpsRepository dumpsRepository) :
+public class UploadDumpMetadataHandler(IDumpsMetadataRepository dumpsMetadataRepository) :
     ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>>
 {
     public async Task<Result<UploadDumpMetadataError, DumpId>> Handle(UploadDumpMetadataCommand command)
     {
-        return await dumpsRepository
+        return await dumpsMetadataRepository
             .LoadDumpMetadata(command.Metadata)
             .MapFault(dbError => new UploadDumpMetadataError());
     }
 }
+
+public record UploadDumpMetadataError;
