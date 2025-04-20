@@ -1,8 +1,8 @@
-using Guts.Server.Dumps.FeatureModels;
+using Guts.Server.DumpsMetadata.FeatureModels;
 using Kontur.Results;
 using MongoDB.Driver;
 
-namespace Guts.Server.Dumps.Repositories.Metadata;
+namespace Guts.Server.DumpsMetadata.Repositories;
 
 public class MongoDbMetadataRepository(
     IMongoCollection<MongoDumpMetadata> collection) : IDumpsMetadataRepository

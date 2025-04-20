@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Guts.Server.Dumps.Repositories.Metadata;
+namespace Guts.Server.DumpsMetadata.Repositories;
 
 [BsonIgnoreExtraElements]
 public class MongoDumpMetadata

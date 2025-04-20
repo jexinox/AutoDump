@@ -1,5 +1,5 @@
 using Guts.Server.CQRS;
-using Guts.Server.Dumps.Repositories.Dumps;
+using Guts.Server.Dumps.Repositories;
 using Kontur.Results;
 
 namespace Guts.Server.Dumps.UploadDump;

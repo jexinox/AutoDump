@@ -1,9 +1,9 @@
 using Guts.Server.CQRS;
-using Guts.Server.Dumps.FeatureModels;
-using Guts.Server.Dumps.Repositories.Metadata;
+using Guts.Server.DumpsMetadata.FeatureModels;
+using Guts.Server.DumpsMetadata.Repositories;
 using Kontur.Results;
 
-namespace Guts.Server.Dumps.SearchMetadata;
+namespace Guts.Server.DumpsMetadata.Search;
 
 public class SearchMetadataQueryHandler(IDumpsMetadataRepository repository) 
     : IQueryHandler<SearchMetadataQuery, Result<SearchDumpMetadataError, IReadOnlyList<UploadedDumpMetadata>>>

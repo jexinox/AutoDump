@@ -1,7 +1,7 @@
-﻿using Guts.Server.Dumps.FeatureModels;
+﻿using Guts.Server.DumpsMetadata.FeatureModels;
 using Kontur.Results;
 
-namespace Guts.Server.Dumps.Repositories.Metadata;
+namespace Guts.Server.DumpsMetadata.Repositories;
 
 public interface IDumpsMetadataRepository
 {
