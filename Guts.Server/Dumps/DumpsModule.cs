@@ -1,6 +1,6 @@
 ﻿using Guts.Server.CQRS;
 using Guts.Server.Dumps.Repositories;
-using Guts.Server.Dumps.UploadDump;
+using Guts.Server.Dumps.Upload;
 using Guts.Server.Modules;
 using Kontur.Results;
 using Microsoft.AspNetCore.Http.HttpResults;

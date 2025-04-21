@@ -2,7 +2,7 @@ using Guts.Server.CQRS;
 using Guts.Server.Dumps.Repositories;
 using Kontur.Results;
 
-namespace Guts.Server.Dumps.UploadDump;
+namespace Guts.Server.Dumps.Upload;
 
 public class UploadDumpCommandHandler(IDumpsRepository repository) : ICommandHandler<UploadDumpCommand, Result<UploadDumpError>>
 {

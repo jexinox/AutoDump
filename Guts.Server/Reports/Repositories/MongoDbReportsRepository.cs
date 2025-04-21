@@ -15,7 +15,7 @@ public class MongoDbReportsRepository(IMongoCollection<MongoReport> collection) 
         return Result.Succeed();
     }
 
-    public async Task<Result<RepositorySearchReportError, IReadOnlyCollection<Report>>> Search(DumpId dumpId)
+    public async Task<Result<RepositorySearchReportError, IReadOnlyList<Report>>> Search(DumpId dumpId)
     {
         var searchResult = await collection.Find(report => report.DumpId == dumpId.Value).ToListAsync();
         

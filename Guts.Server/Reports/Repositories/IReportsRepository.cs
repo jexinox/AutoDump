@@ -7,7 +7,7 @@ public interface IReportsRepository
 {
     Task<Result<RepositoryUploadReportError>> Upload(Report report);
     
-    Task<Result<RepositorySearchReportError, IReadOnlyCollection<Report>>> Search(DumpId dumpId);
+    Task<Result<RepositorySearchReportError, IReadOnlyList<Report>>> Search(DumpId dumpId);
 }
 
 public record RepositoryUploadReportError;
