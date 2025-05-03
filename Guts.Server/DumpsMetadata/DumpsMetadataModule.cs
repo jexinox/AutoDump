@@ -44,18 +44,23 @@ public class DumpsMetadataModule : IApiModule
     }
     
     private record UploadDumpMetadataRequest(string Locator, string FileName, DateTimeOffset TimeStamp);
+    
+    private record UploadDumpMetadataResponse(Guid DumpId);
 
-    private static async Task<Results<CreatedAtRoute, BadRequest>> UploadDumpMetadata(
+    private static async Task<Results<CreatedAtRoute<UploadDumpMetadataResponse>, BadRequest>> UploadDumpMetadata(
         [FromBody] UploadDumpMetadataRequest request,
         [FromServices] ICommandHandler<UploadDumpMetadataCommand, Result<UploadDumpMetadataError, DumpId>> handler)
     {
         // TODO: faults
         var handleResult = await handler
             .Handle(new(new(new(request.Locator), request.FileName, request.TimeStamp)))
-            .MapValue(id => TypedResults.CreatedAtRoute(DumpsModule.UploadDumpRouteName, new()
-            {
-                ["dumpId"] = id.Value 
-            }))
+            .MapValue(id => TypedResults.CreatedAtRoute(
+                new UploadDumpMetadataResponse(id.Value),
+                DumpsModule.UploadDumpRouteName,
+                new()
+                {
+                    ["dumpId"] = id.Value 
+                }))
             .MapFault(_ => TypedResults.BadRequest());
                     
         return handleResult.TryGetValue(out var value, out var fault) 

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net9SDump", "TestApps\Net9S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net9WSDump", "TestApps\Net9WSDump\Net9WSDump.csproj", "{3C003868-FDB7-42E9-B20D-349758150423}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.DirectoryWatcher", "Guts.DirectoryWatcher\Guts.DirectoryWatcher.csproj", "{F01496D7-9E95-4CF9-BB06-D6AF0A044FE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{3C003868-FDB7-42E9-B20D-349758150423}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C003868-FDB7-42E9-B20D-349758150423}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C003868-FDB7-42E9-B20D-349758150423}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F01496D7-9E95-4CF9-BB06-D6AF0A044FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F01496D7-9E95-4CF9-BB06-D6AF0A044FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F01496D7-9E95-4CF9-BB06-D6AF0A044FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F01496D7-9E95-4CF9-BB06-D6AF0A044FE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BC93789D-7A37-4ACF-885A-A9B85965EDB9} = {D95AE3A3-06E9-44AC-9234-971F05878565}
