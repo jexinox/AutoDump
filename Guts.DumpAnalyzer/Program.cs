@@ -27,7 +27,8 @@ Console.WriteLine("Top-10 types by size");
 Console.WriteLine(
     string.Join(
         Environment.NewLine,
-        dump.Graph.EnumerateByDfs()
+        dump.Graph
+            .EnumerateByDfs()
             .Select(node => (node.Type.Name, node.Size))
             .Where(pair => pair.Name is not null)
             .OfType<(string Name, ulong Size)>()

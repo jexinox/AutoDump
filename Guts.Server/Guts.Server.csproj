@@ -10,6 +10,7 @@
     <ItemGroup>
       <PackageReference Include="Kontur.Results" Version="3.0.0" />
       <PackageReference Include="Kontur.Results.Monad" Version="3.0.0" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
       <PackageReference Include="Minio" Version="6.0.4" />
       <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
     </ItemGroup>
@@ -18,6 +19,10 @@
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Guts.EventsModels\Guts.EventsModels.csproj" />
     </ItemGroup>
 
 </Project>

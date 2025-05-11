@@ -3,6 +3,7 @@ using Guts.Server.Dumps.Repositories;
 using Guts.Server.Dumps.Upload;
 using Guts.Server.Modules;
 using Kontur.Results;
+using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Minio;
@@ -19,7 +20,20 @@ public class DumpsModule : IApiModule
         serviceCollection
             .AddMinio("adminadmin", "adminadmin")
             .AddSingleton<IDumpsRepository, S3DumpsRepository>()
-            .AddSingleton<ICommandHandler<UploadDumpCommand, Result<UploadDumpError>>, UploadDumpCommandHandler>();
+            .AddSingleton<ICommandHandler<UploadDumpCommand, Result<UploadDumpError>>, UploadDumpCommandHandler>()
+            .AddMassTransit(massTransit =>
+            {
+                massTransit.SetKebabCaseEndpointNameFormatter();
+                massTransit.UsingRabbitMq((context, configurator) =>
+                {
+                    configurator.ConfigureEndpoints(context);
+                });
+            });
+        
+        serviceCollection
+            .AddOptions<RabbitMqTransportOptions>()
+            .BindConfiguration("RabbitMq");
+        
         return serviceCollection;
     }
     

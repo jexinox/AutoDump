@@ -19,6 +19,13 @@ public class Dump
         return new(runtime, DumpObjectsGraph.Create(runtime.Heap));
     }
 
+    public static Dump Create(string name, Stream dumpStream)
+    {
+        var dataTarget = DataTarget.LoadDump(name, dumpStream);
+        var runtime = dataTarget.ClrVersions[0].CreateRuntime();
+        return new(runtime, DumpObjectsGraph.Create(runtime.Heap));
+    }
+
     public DumpObjectsGraph Graph { get; }
     
     public DumpDominatorsTree GetDominatorsTree() => DumpDominatorsTree.Create(Graph);

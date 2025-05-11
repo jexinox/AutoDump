@@ -1,7 +1,17 @@
-namespace Guts.Server.Reports.FeatureModels;
+using Refit;
+
+namespace Guts.DumpsDaemon;
+
+public interface IGutsServerClient
+{
+    [Post("/api/v1/dumps/{dumpId}/reports")]
+    Task UploadReport(Guid dumpId, Report report);
+
+    [Get("/api/v1/dumps/{dumpId}")]
+    Task<Stream> GetDump(Guid dumpId);
+}
 
 public record Report(
-    DumpId DumpId,
     IReadOnlyList<TypeAndSize> TypesTopBySize,
     IReadOnlyList<TypeAndSize> TypesTopByRetainedSize,
     IReadOnlyList<TypeAndSize> BoxedTypesTopBySize,
