@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.EventsModels", "Guts.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.DumpsDaemon", "Guts.DumpsDaemon\Guts.DumpsDaemon.csproj", "{02B5700A-E562-4934-8858-0880B050CB8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guts.CLI", "Guts.CLI\Guts.CLI.csproj", "{9563DFCA-39A7-40F0-B094-A134C2EC37E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{02B5700A-E562-4934-8858-0880B050CB8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02B5700A-E562-4934-8858-0880B050CB8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02B5700A-E562-4934-8858-0880B050CB8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9563DFCA-39A7-40F0-B094-A134C2EC37E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9563DFCA-39A7-40F0-B094-A134C2EC37E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9563DFCA-39A7-40F0-B094-A134C2EC37E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9563DFCA-39A7-40F0-B094-A134C2EC37E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BC93789D-7A37-4ACF-885A-A9B85965EDB9} = {D95AE3A3-06E9-44AC-9234-971F05878565}

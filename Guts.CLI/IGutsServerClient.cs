@@ -1,15 +1,21 @@
 using Refit;
 
-namespace Guts.DumpsDaemon;
+namespace Guts.CLI;
 
 public interface IGutsServerClient
 {
-    [Post("/api/v1/dumps/{dumpId}/reports")]
-    Task UploadReport(Guid dumpId, Report report);
+    [Get("/api/v1/dumps/metadatas")]
+    public Task<UploadedDumpMetadata[]> SearchMetadatas(string locator);
 
-    [Get("/api/v1/dumps/{dumpId}")]
-    Task<Stream> GetDump(Guid dumpId);
+    [Get("/api/v1/dumps/{dumpId}/reports")]
+    public Task<Report[]> GetReports(Guid dumpId);
 }
+
+public record UploadedDumpMetadata(DumpId DumpId, Locator Locator, string FileName, DateTimeOffset TimeStamp);
+
+public record DumpId(Guid Value);
+
+public record Locator(string Value);
 
 public record Report(
     IReadOnlyList<TypeAndSize> TypesTopBySize,
