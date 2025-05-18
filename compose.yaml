@@ -1,9 +1,9 @@
 ﻿services:
-  guts.server:
-    image: guts.server
+  autodump.server:
+    image: autodump.server
     build:
       context: .
-      dockerfile: Guts.Server/Dockerfile
+      dockerfile: AutoDump.Server/Dockerfile
   
   minio:
     image: minio/minio
@@ -21,7 +21,7 @@
       - minio
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set guts http://minio:9000 adminadmin adminadmin;
-      /usr/bin/mc mb guts/guts-dumps;
+      /usr/bin/mc alias set autodump http://minio:9000 adminadmin adminadmin;
+      /usr/bin/mc mb autodump/autodump-dumps;
       exit 0;
       "

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-AutoDump.DumpsDaemon-dc03a31f-23ed-4c27-9900-d02ed22feae7</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2"/>
+        <PackageReference Include="Refit" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AutoDump.DumpAnalyzer\AutoDump.DumpAnalyzer.csproj" />
+      <ProjectReference Include="..\AutoDump.EventsModels\AutoDump.EventsModels.csproj" />
+    </ItemGroup>
+</Project>
