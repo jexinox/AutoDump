@@ -11,8 +11,10 @@
       <PackageReference Include="Kontur.Results" Version="3.0.0" />
       <PackageReference Include="Kontur.Results.Monad" Version="3.0.0" />
       <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
       <PackageReference Include="Minio" Version="6.0.4" />
       <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
     </ItemGroup>
 
     <ItemGroup>

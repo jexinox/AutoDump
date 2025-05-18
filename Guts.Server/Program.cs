@@ -13,6 +13,7 @@ if (builder.Environment.IsDevelopment())
     builder.Logging.AddConsole();
 }
 
+builder.Services.AddOpenApi().AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString().Replace("+", ".")));
 builder.Services
     .AddSingleton<IMongoClient>(_ => new MongoClient(
         new MongoUrl("mongodb://localhost:27017/?readPreference=primary&appname=guts.server&directConnection=true&ssl=false")))
@@ -21,6 +22,11 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapModulesEndpoints(modules);
+app
+    .MapModulesEndpoints(modules)
+    .MapOpenApi();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
