@@ -15,3 +15,7 @@ public class ServerCommands
         Console.WriteLine(SettingsStorage.GetServerUrl());
     }
 }
+
+
+
+

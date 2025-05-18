@@ -25,3 +25,23 @@
       /usr/bin/mc mb autodump/autodump-dumps;
       exit 0;
       "
+
+  rabbitmq:
+    image: masstransit/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=autodump
+      - RABBITMQ_DEFAULT_PASS=autodump
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: autodump
+      MONGO_INITDB_ROOT_PASSWORD: autodump
+      MONGO_INITDB_DATABASE: autodump
+  

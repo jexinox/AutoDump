@@ -7,6 +7,7 @@ namespace AutoDump.CLI.Commands;
 public class DumpsCommands
 {
     private static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    
     public async Task Get(string appLocator, string? reportsFolder = null)
     {
         var url = SettingsStorage.GetServerUrl();
