@@ -8,7 +8,7 @@ public class DumpsCommands
 {
     private static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
     
-    public async Task Get(string appLocator, string? reportsFolder = null)
+    public async Task Get(string locator, string? reportsFolder = null)
     {
         var url = SettingsStorage.GetServerUrl();
         if (url is null)
@@ -18,10 +18,10 @@ public class DumpsCommands
         }
 
         var serverClient = RestService.For<IAutoDumpServerClient>(url);
-        var metadatas = await serverClient.SearchMetadatas(appLocator);
+        var metadatas = await serverClient.SearchMetadatas(locator);
         for (var i = 0; i < metadatas.Length; i++)
         {
-            Console.WriteLine($"{i + 1}. {metadatas[i]}");
+            Console.WriteLine($"{i + 1}. FileName: {metadatas[i].FileName}, TimeStamp: {metadatas[i].TimeStamp}");
         }
         
         Console.Write("Please choose metadata: ");
@@ -155,7 +155,8 @@ public class DumpsCommands
             }
 
             var time = DateTime.Now;
-            await File.WriteAllTextAsync(reportsPath + $"/Report_{appLocator}_{time}_{i + 1}.html", outHtml);
+            var fileName = reportsPath + $"/Report_{locator}_{time:O}_{i + 1}.html";
+            await File.WriteAllTextAsync(fileName, outHtml);
         }
     }
 }
