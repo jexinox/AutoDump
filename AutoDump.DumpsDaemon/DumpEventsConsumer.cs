@@ -4,11 +4,15 @@ using MassTransit;
 
 namespace AutoDump.DumpsDaemon;
 
-public class DumpEventsConsumer(IAutoDumpServerClient serverClient) : IConsumer<UploadedDumpEvent>
+public class DumpEventsConsumer(
+    IAutoDumpServerClient serverClient,
+    ILogger<DumpEventsConsumer> log) : IConsumer<UploadedDumpEvent>
 {
     public async Task Consume(ConsumeContext<UploadedDumpEvent> context)
     {
         var dumpId = context.Message.DumpId;
+        log.LogInformation("Received new dump event. DumpId: {dumpId}", dumpId);
+
         var dumpStream = await serverClient.GetDump(dumpId);
         var dump = Dump.Create(dumpId.ToString(), dumpStream);
 
@@ -18,8 +22,11 @@ public class DumpEventsConsumer(IAutoDumpServerClient serverClient) : IConsumer<
             GetTopTenBoxedTypesBySize(dump),
             GetGenerationsSizes(dump),
             GetUnhandledExceptions(dump));
-
+        log.LogInformation("Successfully analyzed dump.");
+        
+        log.LogInformation("Started uploading report.");
         await serverClient.UploadReport(dumpId, report);
+        log.LogInformation("Successfully uploaded report.");
     }
 
     private static List<TypeAndSize> GetTopTenTypesBySize(Dump dump)

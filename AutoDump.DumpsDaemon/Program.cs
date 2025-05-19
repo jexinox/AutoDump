@@ -17,6 +17,7 @@ builder.Services
             configurator.ConfigureEndpoints(context);
         });
     })
+    .AddLogging(c => c.AddConsole())
     .AddSingleton<IAutoDumpServerClient>(
         services => RestService.For<IAutoDumpServerClient>(services.GetRequiredService<AutoDumpServerClientOptions>().Url));
 
